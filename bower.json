@@ -22,8 +22,8 @@
     "/js"
   ],
   "main": [
-    "dist/css/sb-admin-2.css",
-    "dist/css/sb-admin-2.min.css",
+    "dist/css/enquero-admin-2.css",
+    "dist/css/enquero-admin-2.min.css",
     "dist/js/enquero-admin-2.js",
     "dist/js/enquero-admin-2.min.js"
   ],
