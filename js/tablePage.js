@@ -11,7 +11,7 @@ var storedColors = JSON.parse(localStorage.getItem("sidePanel"));
 console.log(storedColors);
 storedColors.forEach(element=>{
     let ele=document.createElement("li");
-          ele.innerHTML=`<a id=${element} href="tables.html" onclick="javascript:mainFn(this.id)"> ${element}</a>`
+          ele.innerHTML=`<a id=${element} href="transactions.html" onclick="javascript:mainFn(this.id)"> ${element}</a>`
           var ul=document.getElementById("side-menu");
           ul.appendChild(ele);
 })
