@@ -2,78 +2,45 @@ $(function () {
 
     Morris.Area({
         element: 'morris-area-chart',
-        data: [{
-            period: '2018 Q1',
-            iphone: 2666,
-            ipad: null,
-            itouch: 2647
-        }, {
-            period: '2018 Q2',
-            iphone: 2778,
-            ipad: 2294,
-            itouch: 2441
-        }, {
-            period: '2010 Q3',
-            iphone: 4912,
-            ipad: 1969,
-            itouch: 2501
-        }, {
-            period: '2018 Q4',
-            iphone: 3767,
-            ipad: 3597,
-            itouch: 5689
-        }, {
-            period: '2018 Q1',
-            iphone: 6810,
-            ipad: 1914,
-            itouch: 2293
-        }, {
-            period: '2018 Q2',
-            iphone: 5670,
-            ipad: 4293,
-            itouch: 1881
-        }, {
-            period: '2018 Q3',
-            iphone: 4820,
-            ipad: 3795,
-            itouch: 1588
-        }, {
-            period: '2019 Q1',
-            iphone: 15073,
-            ipad: 5967,
-            itouch: 5175
-        }, {
-            period: '2019 Q2',
-            iphone: 10687,
-            ipad: 4460,
-            itouch: 2028
-        }, {
-            period: '2019 Q3',
-            iphone: 8432,
-            ipad: 5713,
-            itouch: 1791
-        }],
-        xkey: 'period',
-        ykeys: ['iphone', 'ipad', 'itouch'],
-        labels: ['Poison', 'BLQ', 'DLQ'],
-        pointSize: 2,
-        hideHover: 'auto',
-        resize: true
+        data:  [
+            { y: '2019 Q4', a: 234, b: 498, c: 450, d: 3701},
+            { y: '2020 Q1', a: 177, b: 678, c: 745, d: 3821},
+            { y: '2020 Q2', a: 145, b: 521, c: 987, d: 4008},
+            { y: '2019 Q1', a: 101, b: 632, c: 394, d: 3811},
+            { y: '2019 Q2', a: 156, b: 401, c: 376, d: 3245},
+            { y: '2019 Q3', a: 178, b: 702, c: 563, d: 3666}
+          ],
+          
+            xkey: 'y',
+            ykeys: ['a', 'b','c','d'],
+            labels: ['Poison', 'BLQ','DLQ','Transactions'],
+            fillOpacity: 0.6,
+            hideHover: 'auto',
+            behaveLikeLine: true,
+            resize: true,
+            pointFillColors:['#ffffff'],
+            pointStrokeColors: ['black'],
+            fillOpacity:0.05,
+            lineColors:['rgb(255, 0, 0)','rgb(77, 24, 24)','rgb(109, 107, 107)','rgb(15, 163, 15)']
     });
 
     Morris.Donut({
         element: 'morris-donut-chart',
         data: [{
             label: "BLQ",
-            value: 12
+            value: 8
         }, {
             label: "DLQ",
-            value: 30
+            value: 4
         }, {
             label: "Poison",
-            value: 20
+            value: 2
+        }, {
+            label: "Transactions",
+            value: 40
         }],
-        resize: true
+        resize: true,
+        colors:['rgb(255, 0, 0)','rgb(77, 24, 24)','rgb(109, 107, 107)','rgb(15, 163, 15)']
     });
 
     Morris.Bar({
