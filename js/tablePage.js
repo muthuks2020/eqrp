@@ -1,10 +1,9 @@
 
 console.log(localStorage['ole'])
-
 document.getElementById('mainHeading').innerHTML=localStorage['ole'];
 // var resource='BLQ'.concat(`.${localStorage['ole']}`);
 const BASE_URL=`https://crosssolved.herokuapp.com/https://termite.rmq.cloudamqp.com/api/queues/ngqgcdqs`;
-
+const BASE_URL3=`https://crosssolved.herokuapp.com/http://transactions-recovery-grid.us-e2.cloudhub.io/message-report`;
 // console.log(BASE_URL1);
 // let val=localStorage['sidePanel'];
 var storedColors = JSON.parse(localStorage.getItem("sidePanel"));
@@ -46,7 +45,8 @@ return response.json();
         if(arr1===localStorage['ole']){
             obj[key]=value.messages;
             obj1[value.name]=value.messages;
-            sum+=value.messages;
+            if(key!=='BLQ' && key!=='DLQ' && key!=='Poison')
+                sum+=value.messages;
         }
     })
     
@@ -116,10 +116,10 @@ return response.json();
         btn1.setAttribute("id",idb);  
         td4.setAttribute("id",tableVl);
         
-        btn1.setAttribute("class","btn btn-warning"); 
-        btn2.setAttribute("id","b2");
+        btn1.setAttribute("class","btn btn-primary"); 
+        btn2.setAttribute("id",`b2${idb}`);
         btn2.setAttribute("type","button");  
-        btn2.setAttribute("class","btn btn-info"); 
+        btn2.setAttribute("class","btn btn-danger"); 
         
         td.innerText=`${value.properties.headers.OrderID}`
         td1.innerText= `${value.properties.headers.dateTime}`;
@@ -142,12 +142,15 @@ return response.json();
         ele.appendChild(td3); 
         ele.appendChild(td4); 
         ele.appendChild(td5);
-        if(localStorage.getItem(`${localStorage.getItem('ole')}row${idb}`)!==value.properties.headers.OrderID){               
+        var abhi=localStorage.getItem(`eliminated`).split(',');
+        // if(value.properties.headers.OrderID!==localStorage.getItem(`${localStorage.getItem('ole')}row${idb}`)){               
+        if(!abhi.includes(value.properties.headers.OrderID)){
         var tb=document.getElementById("tableBody");
         tb.appendChild(ele);
         glbRes=document.getElementById(`headTran${idb}`).innerText+'.'+localStorage['ole'];    
     
         var foo =document.getElementById(idb);
+        var rep=document.getElementById(`b2${idb}`);
         
         var objD={
             OrderID: value.properties.headers.OrderID,
@@ -156,10 +159,18 @@ return response.json();
             retry: retry,
             rowId: `row${idb}`
         }
-        
+        var objM={
+            interface:localStorage.getItem('ole'),
+            OrderID: value.properties.headers.OrderID,
+            dateTime: value.properties.headers.dateTime,
+            errorType: value.properties.headers.errorType,
+            retry: retry,
+            errorQueue:val,
+            rowId: `row${idb}`
+        }
         if(foo.addEventListener){
             foo.addEventListener('click',publishMessage(retry,tableVl,glbRes, objD,val));
-            
+            rep.addEventListener('click',publishMail(objM));
         }
     }               
     }
@@ -168,9 +179,9 @@ return response.json();
 
 setZero();
 // countTable();
-tableData('BLQ');
-tableData('DLQ');
-tableData('Poison');
+setTimeout(tableData('BLQ'),1);
+setTimeout(tableData('DLQ'),2);
+setTimeout(tableData('Poison'),3);
 //tableData('');
 
 // function for publishing message through exchange
@@ -178,7 +189,10 @@ tableData('Poison');
 
 var publishMessage=function(retry,vl,glbD, objD,nmV){    
 return function curried_func(e){
-    localStorage.setItem(`${localStorage.getItem('ole')}${objD.rowId}`,objD.OrderID);
+    var arr=localStorage.getItem('eliminated').split(',');
+    if(!arr.includes(objD.OrderID)){
+    arr.push(objD.OrderID);
+    localStorage.setItem(`eliminated`,arr);}
     
     retry+=1;
     var pIn=parseInt(localStorage.getItem(`${nmV}${localStorage.getItem('ole')}`))
@@ -201,6 +215,7 @@ return function curried_func(e){
     }
     var exgRes=`EXG.${localStorage['ole']}`
     const BASE_URL2=`https://crosssolved.herokuapp.com/https://ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2@termite.rmq.cloudamqp.com/api/exchanges/ngqgcdqs/${exgRes}/publish`;
+    
     fetch(`${BASE_URL2}`,{
         method: 'POST',
         body: JSON.stringify(payloadExc),
@@ -216,10 +231,49 @@ return function curried_func(e){
     .then((myJson)=>{
         console.log(myJson);
         document.getElementById(objD.rowId).innerText='';
+
         // countTable();
     })
 }
 }
+
+var publishMail=function(objM){    
+    return function curry_func(e){
+        
+        var idK=localStorage.getItem('ole').split('.');
+        var mailPayload={
+            "Interface": objM.interface,
+            "IdKey": `${idK[0]} ID`,
+            "IdValue": objM.OrderID,
+            "DateTime": objM.dateTime,
+            "ErrorType": objM.errorType,
+            "ErrorQueue": objM.errorQueue,
+            "Retries": objM.retry
+        }
+        fetch(`${BASE_URL3}`,{
+            method: 'POST',
+            body: JSON.stringify(mailPayload),
+            headers: new Headers({
+                'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
+        // 'Authorization': 'Basic '+btoa(`ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2`)
+        })
+        }).then((response) => {
+        return response.json();
+        })
+        .then((myJson)=>{
+            console.log(myJson);
+            // alert(`mail sent status ${myJson.status}`);
+            var alertBox=confirm("Are you sure you want to proceed?")
+            if(alertBox){
+                document.getElementById(objM.rowId).innerText='';
+                var arr1=localStorage.getItem('eliminated').split(',');
+                if(!arr1.includes(objM.OrderID)){
+                    arr1.push(objM.OrderID);
+                    localStorage.setItem(`eliminated`,arr1);}
+            }
+        })}}   
 
 function AutoRefresh( t ) {
     setTimeout("location.reload(true);", t);
@@ -230,5 +284,8 @@ function mainFn(clicked){
   console.log(value);
 
 	// Save back to localStorage
-	localStorage.setItem('ole', value);}
+    localStorage.setItem('ole', value);
+}
     // localStorage['ole']=value;}
+
+document.getElementById("mailInterface").innerHTML=localStorage.getItem('ole');    

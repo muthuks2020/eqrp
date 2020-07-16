@@ -1,5 +1,5 @@
 // const axios = require('axios');
-
+localStorage.setItem('eliminated',[]);
 const BASE_URL='https://crosssolved.herokuapp.com/https://termite.rmq.cloudamqp.com/api/queues/ngqgcdqs';
 
 // let valueArray;
