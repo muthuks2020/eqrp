@@ -1,0 +1,438 @@
+#%RAML 1.0
+title: QMP System API. 
+
+version: v1
+baseUri: https://mocksvc.mulesoft.com/mocks/13725f38-07b6-4fcc-9d7a-fe0e1ce8b79d/api/v1 
+
+securitySchemes:
+#  client-credentials:
+#   type: x-client-credentials
+#    description: Use application client_id and secret assigned by API administrator.
+#  basic:
+#    type: Basic Authentication
+
+uses: 
+  commontraits: traits/traits.raml
+  commontypes: types/commonlibrary.raml
+
+/ping:
+  get:
+    description: Return a standard response.
+    is: [commontraits.accept-required,commontraits.standard-error-responses]
+    responses:
+      200:
+        headers: 
+          x-transaction-id: commontypes.x-transaction-id
+        body:
+          application/json:
+            example: !include examples/ping/get-response.json
+  put:
+    description: Return a standard response
+    is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+    body:
+      application/json:
+        example: !include examples/ping/put-request.json
+    responses:
+      200:
+        headers: 
+          x-transaction-id: commontypes.x-transaction-id
+        body:
+          application/json:
+            example: !include examples/ping/put-response.json
+  /all:
+    get:
+      description: Return a database connection status response.
+      is: [commontraits.accept-required,commontraits.standard-error-responses]
+      responses:
+        200:
+          headers: 
+            x-transaction-id: commontypes.x-transaction-id
+          body:
+            application/json:
+              example: !include examples/ping/getall-response.json
+/inspection:
+   post:
+     description: Save QA results to the QMP table T_Inspection.
+     is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+     body:
+       application/json:
+         type: !include api/schemas/PostInspectionRequestSchema.json
+         example: !include examples/PostInspectionRequest.json
+     responses:
+       201:
+         headers:
+           x-transaction-id: commontypes.x-transaction-id
+         body:
+           application/json:
+             example: !include examples/PostInspectionResponse.json
+   /details:
+    post:
+      description: Save Qa results to the QMP table T_InspectionDetails .
+      is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+      body: 
+        application/json:
+          example: !include examples/PostInspectionDetailsRequest.json
+      responses:
+        201:
+          headers:
+            x-transaction-id: commontypes.x-transaction-id
+          body:
+            application/json:
+              example: !include examples/PostInspectionDetailsResponse.json
+    
+   /attachments:
+    post:
+      description: Save Inspection result attachments to the amazon s3 qmp bucket with record Id as subfolders.
+      is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+      body: 
+        application/json:
+          example: !include examples/PostInspectionAttachmentRequest.json
+      responses:
+        201:
+          headers:
+            x-transaction-id: commontypes.x-transaction-id
+          body:
+            application/json:
+              example: !include examples/PostInspectionAttachmentResponse.json
+      
+/ranch:
+  /override:
+    get:
+      queryParameters:
+        ranchnbr:
+          type: string
+          required: false
+          description: Filters the results on ranchnbr
+      description: Returns the list of all active ranches
+      is: [commontraits.accept-required, commontraits.standard-error-responses]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/Get-RanchOverrideResponse.json
+    post:
+      description: Updates or Inserts the Ranch override info
+      is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+      body:
+        application/json:
+          example: !include examples/Post-RanchOverrideRequest.json
+      responses:
+        201:
+          body:
+            application/json:
+              example: !include examples/PostSuccessResponse.json
+/receipt:
+   post:
+     description: Save QA results to the QMP table T_Inspection.
+     is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+     body:
+       application/json:
+         example: !include examples/PostReceiptRequest.json
+     responses:
+       201:
+         headers:
+           x-transaction-id: commontypes.x-transaction-id
+         body:
+           application/json:
+             example: !include examples/PostReceiptResponse.json
+/inspectionbypass:
+  get:
+    queryParameters:
+      berrytype:
+        type: string
+        required: false
+        description: Filters the results on warehouses
+      warehousenbr:
+        type: string
+        required: false
+        description: Filters the results on berrytype
+      variety:
+        type: string
+        required: false
+        description: Filters the results on variety
+      estimategroup:
+        type: string
+        required: false
+        description: Filters the results on estimate group    
+    description: Returns the list of all warehouses
+    is: [commontraits.accept-required, commontraits.standard-error-responses]
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/Get-InspectionBypassResponse.json
+  post:
+    description: Updates or Inserts the Records in InspectionBypass 
+    is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+    body:
+      application/json:
+        example: !include examples/Post-InspectionBypassRequest.json
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include examples/PostSuccessResponse.json
+/pallet:
+   post:
+     description: Save Pallet Info to the QMP database.
+     is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+     body:
+       application/json:
+         example: !include examples/PostPalletRequest.json
+     responses:
+       201:
+         headers:
+           x-transaction-id: commontypes.x-transaction-id
+         body:
+           application/json:
+             example: !include examples/PostPalletResponse.json
+/palletlot:
+  post:
+    description: Save Pallet Lot Info to the QMP database.
+    is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+    body:
+      application/json:
+        example: !include examples/PostPalletlotRequest.json
+    responses:
+      201:
+        headers:
+          x-transaction-id: commontypes.x-transaction-id
+        body:
+          application/json:
+            example: !include examples/PostPalletlotResponse.json
+
+/receipt-pallet-palletlot:
+  get:
+    description: Fetch the Receipt,Pallet and PalletLot details using lot number, license number, pallet guid
+    is: [commontraits.accept-required,commontraits.standard-error-responses]
+    queryParameters:
+      lotNbr:
+        type: string
+        required: false
+      licenseNbr:
+        type: string
+        required: false
+      palletGuid:
+        type: string
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/ReceiptPalletPalletLotResponse.json       
+
+/inspectionbypassrank:
+  get:
+    description: Fetch the bypass flag from QMP database
+    is: [commontraits.accept-required,commontraits.standard-error-responses]
+    queryParameters:
+      ranchnbr:
+        type: string
+        required: true
+        description: Filters the results on Ranch Number
+      berrytype:
+        type: string
+        required: true
+        description: Filters the results on berrytype
+      inspectionlocation:
+        type: string
+        required: true
+        description: Filters the results on inspection location
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/GetInspectionBypassRankResponse.json
+/notification:
+  get:
+    queryParameters:
+      warehousenbr:
+        type: string
+        required: false
+        description: Filters the results on warehouses
+      berrytype:
+        type: array
+        required: false
+        description: Filters theb results on berrytype
+    description: Returns the list of users for notifaction based on warehouse
+    is: [commontraits.accept-required, commontraits.standard-error-responses]
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/Get-NotificationResponse.json
+  post:
+     description: Updates or Inserts the notification on Warehouse level
+     is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+     body:
+       application/json:
+         example: !include examples/PostNotificationRequest.json
+     responses:
+       201:
+          body:
+            application/json:
+              example: !include examples/PostSuccessResponse.json
+  /email:
+    get:
+      queryParameters:
+        notifytype:
+          type: string
+          required: false
+          description: Filters emails based on notificationType
+          default: 'IsNotifyOnReject'
+          enum:
+          - 'IsNotifyOnAlmostReject'
+          - 'IsNotifyOnAll'
+        ranchnbr:
+          type: string
+          required: false
+          description: Filters emails based on ranch number
+      description: Returns all emails with Rejection notification turned on
+      is: [commontraits.accept-required, commontraits.standard-error-responses]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/GetNotificationEmailResponse.json
+/pqpoolresult:
+  get:
+    queryParameters:
+      poolweek:
+        type: string
+        required: true
+    description: filter the poolweek daylist results
+    is: [commontraits.accept-required,commontraits.standard-error-responses]
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/PoolResultResponse.json
+/palletlotadjustment:
+  post:
+    description: Updates or Inserts the notification on Warehouse level
+    is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+    body:
+      application/json:
+        example: !include examples/PostAdjustmentRequest.json
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include examples/PostSuccessResponse.json
+/pointmatrix:
+  displayName: PointMatrix
+  description: Process Brix Information
+  post:
+   description: Updates or Inserts the Brix Score
+   is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+   body:
+    application/json:
+         example: !include examples/PostPointMatrixRequest.json
+   responses:
+       201:
+          body:
+            application/json:
+              example: !include examples/PostPointMatrixResponse.json
+  get:
+    description: Returns the PointMatrix Records.
+    is: [commontraits.accept-required, commontraits.standard-error-responses]
+    queryParameters:
+      attributetype:
+        type: string
+        required: false
+        description: Filters the results on on attributetype
+      berrytype:
+        type: string
+        required: false
+        description: Filters the results on berrytype
+      poolweek:
+        type: array
+        required: false
+        description: Filters the results on poolweek
+      qmpdistrictgroup:
+        type: string
+        required: false
+        description: Filters the results on on district group code
+      estimategroup:
+        type: string
+        required: false
+        description: Filters the results on on estimate group value  
+      varietycode:
+        type: string
+        required: false
+        description: Filters the results on varietycode
+      label:
+        type: string
+        required: false
+        description: Filters the results on label
+      pointmatrixid:
+        type: string
+        required: false
+        description: Filters the results on pointmatrixid
+      status:
+        type: string
+        required: true
+        description: Filters the results on status of entry    
+    responses:
+       200:
+          body:
+            application/json:
+              example: !include examples/GetPointMatrixResponse.json
+/pointmatrixlookup:
+  displayName: PointMatrixLookUp
+  description: Returns Brix Information on pointmatrixid
+  get:
+    description: Returns the PointMatrixLookUp Records.
+    is: [commontraits.accept-required, commontraits.standard-error-responses]
+    queryParameters:
+      pointmatrixid:
+        type: array
+        required: false
+        description: Filters the results on pointmatrixid  
+    responses:
+       200:
+          body:
+            application/json:
+              example: !include examples/GetPointMatrixLookUpResponse.json
+/qamanager:
+  displayName: QA Manager
+  description: Returns data for local QA Manager
+  get:
+    description: Returns the Local QA Manager records.
+    is: [commontraits.accept-required, commontraits.standard-error-responses]
+    queryParameters:
+      producingareacode:
+        type: string
+        required: false
+        description: Filters on the basis of producing area code
+      emailaddress:
+        type: string
+        required: false
+        description: Filters on the basis of QA manager email address    
+    responses:
+       200:
+          body:
+            application/json:
+              example: !include examples/GetQAManagerResponse.json
+  post:
+    description: Updates or Inserts the local qa manager data
+    is: [commontraits.accept-required,commontraits.content-type-required, commontraits.standard-error-responses]
+    body:
+      application/json:
+        example: !include examples/PostQAManagerResquest.json
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include examples/PostSuccessResponse.json            
+/districtproducingareamap:
+  displayName: District Group
+  description: Returns list of district group
+  get:
+    description: Returns the list of district group.
+    is: [commontraits.accept-required, commontraits.standard-error-responses]    
+    responses:
+       200:
+          body:
+            application/json:
+              example: !include examples/GetDistrictProducingAreaMapResponse.json        
