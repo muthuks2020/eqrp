@@ -35,7 +35,10 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
+    <script>
+        if(!sessionStorage.getItem('sess'))
+            document.write('<script type="text/undefined">')
+    </script>
 </head>
 
 <!-- <body onload = "JavaScript:AutoRefresh(10000);"> -->
@@ -51,7 +54,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Enquero-Transactions Recovery Grid</a>
+                <a class="navbar-brand" href="dashboard.html">Enquero-Transactions Recovery Grid</a>
+                <a href="index.html" style="position: absolute; left: 90%;top:1.5rem" onclick="logout()">Logout</a>
             </div>
 
 
@@ -60,7 +64,7 @@
                     <ul class="nav" id="side-menu">
 
                         <li>
-                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i>Dashboard</a>
+                            <a href="dashboard.html"><i class="fa fa-dashboard fa-fw"></i>Dashboard</a>
                         </li>
                     </ul>
                 </div>
@@ -119,147 +123,12 @@
                                         <th>Retries</th>
                                         <th>Actions</th>
                                     </tr>
+                                    <lable style="position:absolute; left: 70%; "> Search:
+                                        <input type="text" id="myInputTextField" style="border-radius: 5px;border:2px solid #555;">
+                                    </lable>
                                 </thead>
                                 <tbody id="tableBody">
                                     
-
-                                    <!-- <tr >
-                                        <td>ORD20204328</td>
-                                        <td>23 June</td>
-                                        <td>21:41</td>
-                                        <td>Amplify Authentication Error</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">1</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-                                    <tr class="odd gradeX">
-                                        <td>ORD20204327</td>
-                                        <td>8 January</td>
-                                        <td>20:52</td>
-                                        <td>DAX Connection Exhausted</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">5</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-
-                                    <tr class="odd gradeA">
-                                        <td>ORD20204326</td>
-                                        <td>11 November</td>
-                                        <td>20:12</td>
-                                        <td>Amplify Authentication Error</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">4</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-                                    <tr class="odd gradeX">
-                                        <td>ORD20204325</td>
-                                        <td>27 Febuary</td>
-                                        <td>20:22</td>
-                                        <td>DAX Connection Exhausted</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">3</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-
-                                    <tr class="odd gradeA">
-                                        <td>ORD20204324</td>
-                                        <td>24 April</td>
-                                        <td>21:32</td>
-                                        <td>DAX Connection Failure</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">2</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-                                    <tr class="odd gradeX">
-                                        <td>ORD20204323</td>
-                                        <td>1 May</td>
-                                        <td>01:32</td>
-                                        <td>Amplify Authentication Error</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">4</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-
-                                    <tr class="odd gradeA">
-                                        <td>ORD20204322</td>
-                                        <td>2 June</td>
-                                        <td>02:32</td>
-                                        <td>DAX Connection Failure</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">1</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-                                    <tr class="odd gradeX">
-										<td>ORD20204312</td>
-                                        <td>5 July</td>
-                                        <td>21:32</td>
-                                        <td>DAX Connection Failure</td>
-                                        <td class="center">DLQ</td>
-                                        <td class="center">0</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-
-                                    <tr class="odd gradeA">
-										<td>ORD20204412</td>
-                                        <td>12 December</td>
-                                        <td>02:40</td>
-                                        <td>Order Status Lookup Data Not Available</td>
-                                        <td class="center">BLQ</td>
-                                        <td class="center">2</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-                                    <tr class="odd gradeX">
-                                        <td>ORD20204512</td>
-                                        <td>15 October</td>
-                                        <td>01:31</td>
-                                        <td>Order Not Present in DAX</td>
-                                        <td class="center">BLQ</td>
-                                        <td class="center">1</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-
-                                    <tr class="odd gradeA">
-                                        <td>ORD20204612</td>
-                                        <td>2 June</td>
-                                        <td>02:40</td>
-                                        <td>Order Not Present in DAX</td>
-                                        <td class="center">BLQ</td>
-                                        <td class="center">5</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr>
-                                    <tr class="odd gradeX">
-                                        <td>ORD20204712</td>
-                                        <td>2 September</td>
-                                        <td>05:20</td>
-                                        <td>Order Status Lookup Data Not Available</td>
-                                        <td class="center">BLQ</td>
-                                        <td class="center">4</td>
-                                        <td class="center"> <button type="button"
-                                                class="btn btn-warning">Re-Queue</button>
-                                            <button type="button" class="btn btn-info">Report</button></td>
-                                    </tr> -->
 
                                 </tbody>
                             </table>
@@ -298,19 +167,17 @@
     <script src="../vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
     <script src="../vendor/datatables-responsive/dataTables.responsive.js"></script>
+    <script src="../js/tablePage.js"></script>
+    <script src="../js/searchTable.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/enquero-admin-2.js"></script>
 
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
-    <script>
-        $(document).ready(function () {
-            $('#dataTables-example').DataTable({
-                responsive: true
-            });
-        });
-    </script>
-    <script src="../js/tablePage.js"></script>
+    <!-- <script>
+        var table = $('#dataTables-example').DataTable();
+    </script> -->
+    
     
 </body>
 

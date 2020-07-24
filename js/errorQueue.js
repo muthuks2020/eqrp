@@ -72,3 +72,6 @@ function mainFn(clicked){
 //     console.log(document.location.href);
 // }
 }
+function logout(){
+  sessionStorage.removeItem('sess');
+}

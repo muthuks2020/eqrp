@@ -1,6 +1,7 @@
 
 console.log(localStorage['ole'])
 document.getElementById('mainHeading').innerHTML=localStorage['ole'];
+var remainder=[];
 // var resource='BLQ'.concat(`.${localStorage['ole']}`);
 const BASE_URL=`https://crosssolved.herokuapp.com/https://termite.rmq.cloudamqp.com/api/queues/ngqgcdqs`;
 const BASE_URL3=`https://crosssolved.herokuapp.com/http://transactions-recovery-grid.us-e2.cloudhub.io/message-report`;
@@ -53,11 +54,11 @@ return response.json();
     // console.log(obj);
     for( var k in obj){
         if(k==='DLQ')
-            document.getElementById('DLQ').innerText=obj[k]-localStorage.getItem('DLQ'+localStorage.getItem('ole'));
+            document.getElementById('DLQ').innerText=obj[k]//-localStorage.getItem('DLQ'+localStorage.getItem('ole'));
         else if(k==='BLQ')
-            document.getElementById('BLQ').innerText=obj[k]-localStorage.getItem('BLQ'+localStorage.getItem('ole'));
+            document.getElementById('BLQ').innerText=obj[k]//-localStorage.getItem('BLQ'+localStorage.getItem('ole'));
         else if(k==='Poison')
-            document.getElementById('Poison').innerText=obj[k]-localStorage.getItem('Poison'+localStorage.getItem('ole'));
+            document.getElementById('Poison').innerText=obj[k]//-localStorage.getItem('Poison'+localStorage.getItem('ole'));
         else
             document.getElementById('messages').innerText=sum;            
     }
@@ -73,13 +74,16 @@ function tableData(val){
 var resource=val.concat(`.${localStorage['ole']}`);
 var reqPayload={
     "count": 10,
-    "requeue": false,
+    "requeue": true,
     "encoding": "auto",
     "truncate": 50000,
     "ackmode": "ack_requeue_true"
 }
 var idCol=localStorage['ole'].split('.');
-document.getElementById('tranID').innerText=idCol[0]+' ID';
+if(idCol[0]==='Notify')
+    document.getElementById('tranID').innerText=idCol[1]+' ID';
+else
+    document.getElementById('tranID').innerText=idCol[0]+' ID';    
 const BASE_URL1=`https://crosssolved.herokuapp.com/https://ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2@termite.rmq.cloudamqp.com/api/queues/ngqgcdqs/${resource}/get`;
 fetch(`${BASE_URL1}`,{
     method: 'POST',
@@ -94,8 +98,19 @@ fetch(`${BASE_URL1}`,{
 return response.json();
 })
 .then((myJson) => {
-    console.log(myJson);
+    // console.log(myJson);
     
+    myJson.forEach(value=>{
+        var eleObj={
+            OrderID: value.properties.headers.OrderID,
+            dateTime: value.properties.headers.dateTime,
+            errorType: value.properties.headers.errorType,
+            retry: value.properties.headers.retry,
+        }
+        remainder.push(eleObj);
+    })
+    console.log(`${val}`,remainder);
+    var dataset=[];
     myJson.forEach(value=>{
         var retry=0;
         idb+=1; 
@@ -132,10 +147,6 @@ return response.json();
         td5.appendChild(btn1); 
         td5.appendChild(btn2);
                        
-                    //    <td class="center">3</td>
-                    //    <td class="center"> <button type="button"
-                    //                             class="btn btn-warning">Re-Queue</button>
-                    //    <button type="button" class="btn btn-info">Report</button></td>
         ele.appendChild(td);
         ele.appendChild(td1);
         ele.appendChild(td2);
@@ -144,13 +155,14 @@ return response.json();
         ele.appendChild(td5);
         var abhi=localStorage.getItem(`eliminated`).split(',');
         // if(value.properties.headers.OrderID!==localStorage.getItem(`${localStorage.getItem('ole')}row${idb}`)){               
-        if(!abhi.includes(value.properties.headers.OrderID)){
+        // if(!abhi.includes(value.properties.headers.OrderID)){
         var tb=document.getElementById("tableBody");
-        tb.appendChild(ele);
-        glbRes=document.getElementById(`headTran${idb}`).innerText+'.'+localStorage['ole'];    
+        // tb.appendChild(ele);
+        // glbRes=document.getElementById(`headTran${idb}`).innerText+'.'+localStorage['ole'];
+        glbRes=td3.innerText+'.'+localStorage['ole'];    
     
-        var foo =document.getElementById(idb);
-        var rep=document.getElementById(`b2${idb}`);
+        var foo =btn1//document.getElementById(idb);
+        var rep=btn2//document.getElementById(`b2${idb}`);
         
         var objD={
             OrderID: value.properties.headers.OrderID,
@@ -159,6 +171,7 @@ return response.json();
             retry: retry,
             rowId: `row${idb}`
         }
+
         var objM={
             interface:localStorage.getItem('ole'),
             OrderID: value.properties.headers.OrderID,
@@ -169,12 +182,15 @@ return response.json();
             rowId: `row${idb}`
         }
         if(foo.addEventListener){
-            foo.addEventListener('click',publishMessage(retry,tableVl,glbRes, objD,val));
-            rep.addEventListener('click',publishMail(objM));
+            foo.addEventListener('click',publishMessage(retry,tableVl,glbRes, objD,val,remainder));
+            rep.addEventListener('click',publishMail(objM,remainder,val));
         }
-    }               
+         remainder=[];
+        //  setTable();
+         searchtab(ele);           
     }
     )
+    
 })}
 
 setZero();
@@ -182,13 +198,17 @@ setZero();
 setTimeout(tableData('BLQ'),1);
 setTimeout(tableData('DLQ'),2);
 setTimeout(tableData('Poison'),3);
+// setTimeout(searchtab(),4);
+// setTimeout(delete('BLQ'))
 //tableData('');
 
 // function for publishing message through exchange
 
 
-var publishMessage=function(retry,vl,glbD, objD,nmV){    
+var publishMessage=function(retry,vl,glbD, objD,nmV,remArr){    
 return function curried_func(e){
+    var exgRes=`EXG.${localStorage['ole']}`
+    const BASE_URL2=`https://crosssolved.herokuapp.com/https://ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2@termite.rmq.cloudamqp.com/api/exchanges/ngqgcdqs/${exgRes}/publish`;
     var arr=localStorage.getItem('eliminated').split(',');
     if(!arr.includes(objD.OrderID)){
     arr.push(objD.OrderID);
@@ -202,19 +222,29 @@ return function curried_func(e){
 
     // var routKey=
     le.innerText=retry;
+    for(var i=0;i<remArr.length;i++){
+        if(remArr[i].OrderID === objD.OrderID){
+            remArr.splice(i,1);
+        }
+    };
+    remArr;
+    setTimeout(deleteFun(nmV),1);
+    setTimeout(reQueue(remArr,nmV,BASE_URL2),4);
+    
+
     var payloadExc={
         "properties": {
+            "headers":{
             "retry": retry,
             "errorType": objD.errorType,
             "OrderID": objD.OrderID,
             "dateTime": objD.dateTime
-        },
+        }},
         "routing_key": ``,
         "payload": "my body",
         "payload_encoding": "string"
     }
-    var exgRes=`EXG.${localStorage['ole']}`
-    const BASE_URL2=`https://crosssolved.herokuapp.com/https://ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2@termite.rmq.cloudamqp.com/api/exchanges/ngqgcdqs/${exgRes}/publish`;
+    
     
     fetch(`${BASE_URL2}`,{
         method: 'POST',
@@ -237,9 +267,14 @@ return function curried_func(e){
 }
 }
 
-var publishMail=function(objM){    
+var publishMail=function(objM,remArr,nmV){    
     return function curry_func(e){
         
+        for(var i=0;i<remArr.length;i++){
+            if(remArr[i].OrderID === objM.OrderID){
+                remArr.splice(i,1);
+            }
+        };
         var idK=localStorage.getItem('ole').split('.');
         var mailPayload={
             "Interface": objM.interface,
@@ -265,6 +300,8 @@ var publishMail=function(objM){
         .then((myJson)=>{
             console.log(myJson);
             // alert(`mail sent status ${myJson.status}`);
+            var exgRes=`EXG.${localStorage['ole']}`
+            const BASE_URL2=`https://crosssolved.herokuapp.com/https://ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2@termite.rmq.cloudamqp.com/api/exchanges/ngqgcdqs/${exgRes}/publish`;
             var alertBox=confirm("Are you sure you want to proceed?")
             if(alertBox){
                 document.getElementById(objM.rowId).innerText='';
@@ -272,6 +309,10 @@ var publishMail=function(objM){
                 if(!arr1.includes(objM.OrderID)){
                     arr1.push(objM.OrderID);
                     localStorage.setItem(`eliminated`,arr1);}
+            
+            deleteFun(nmV);
+            reQueue(remArr,nmV,BASE_URL2);
+            
             }
         })}}   
 
@@ -288,4 +329,97 @@ function mainFn(clicked){
 }
     // localStorage['ole']=value;}
 
-document.getElementById("mailInterface").innerHTML=localStorage.getItem('ole');    
+// document.getElementById("mailInterface").innerHTML=localStorage.getItem('ole');    
+function reQueue(remArr,nmV,BASE_URL2){
+    remArr.forEach(value=>{
+        var pushPayload={
+            "properties": {
+                "headers":{
+                "retry": value.retry,
+                "errorType": value.errorType,
+                "OrderID": value.OrderID,
+                "dateTime": value.dateTime
+            }},
+            "routing_key": nmV,
+            "payload": "my body",
+            "payload_encoding": "string"
+        }
+
+        fetch(`${BASE_URL2}`,{
+            method: 'POST',
+            body: JSON.stringify(pushPayload),
+            headers: new Headers({
+                'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
+        'Authorization': 'Basic '+btoa(`ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2`)
+        })
+        }).then((response) => {
+        return response.json();
+        })
+        .then((myJson)=>{
+            console.log('queueing Again',myJson);
+            
+        })
+    })
+}
+
+function deleteFun(nmV){
+    var resource=nmV.concat(`.${localStorage['ole']}`);
+    // var delPayload={
+    //     "count": 10,
+    //     "requeue": true,
+    //     "encoding": "auto",
+    //     "truncate": 50000,
+    //     "ackmode": "ack_requeue_false"
+    // }
+    //var idCol=localStorage['ole'].split('.');
+    const BASE_URL1=`https://crosssolved.herokuapp.com/https://ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2@termite.rmq.cloudamqp.com/api/queues/ngqgcdqs/${resource}/contents`;
+    fetch(`${BASE_URL1}`,{
+        method: 'DELETE',
+        // body:JSON.stringify(delPayload),
+        headers: new Headers({
+            'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin' : '*',
+    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
+    'Authorization': 'Basic '+btoa(`ngqgcdqs:LSuLMmPedYVkDJ9bQNJbqJCnOML3i_a2`)
+    })
+    }).then((response) => {
+        if(response.status!==204)
+            return response.json();
+        else
+            return null;    
+    })
+    .then((myJson) => {
+        console.log('delete',myJson);
+    })
+}
+
+function searchtab(ele){
+// table.clear();    
+var table = $('#dataTables-example').DataTable({
+    "sDom":"ltipr"
+});
+
+table.rows.add([ele]).draw();
+
+// #myInput is a <input type="text"> element
+$('#myInputTextField').on( 'keyup', function () {
+    table.search( $(this).val() ).draw();
+} );
+}
+
+// var setTable= (function() {
+//     var executed = false;
+//     return function() {
+//         if (!executed){
+//             executed=true;
+//             var table = $('#dataTables-example').DataTable({
+//                 "sDom":"ltipr"
+//             });
+//         }
+//     }
+// })
+function logout(){
+    sessionStorage.removeItem('sess');
+}
