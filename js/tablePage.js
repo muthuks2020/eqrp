@@ -204,7 +204,7 @@ setTimeout(tableData('Poison'),3);
 
 // function for publishing message through exchange
 
-
+// **** API calll 
 var publishMessage=function(retry,vl,glbD, objD,nmV,remArr){    
 return function curried_func(e){
     var exgRes=`EXG.${localStorage['ole']}`
@@ -267,6 +267,7 @@ return function curried_func(e){
 }
 }
 
+//**** API call for publishing the message ****
 var publishMail=function(objM,remArr,nmV){    
     return function curry_func(e){
         
@@ -329,7 +330,7 @@ function mainFn(clicked){
 }
     // localStorage['ole']=value;}
 
-// document.getElementById("mailInterface").innerHTML=localStorage.getItem('ole');    
+// **** Re queue functionality for specific error queue ****   
 function reQueue(remArr,nmV,BASE_URL2){
     remArr.forEach(value=>{
         var pushPayload={
@@ -364,6 +365,7 @@ function reQueue(remArr,nmV,BASE_URL2){
     })
 }
 
+//****  delete all the entries in the queue ****
 function deleteFun(nmV){
     var resource=nmV.concat(`.${localStorage['ole']}`);
     // var delPayload={
@@ -395,10 +397,12 @@ function deleteFun(nmV){
     })
 }
 
+// to fill up the table by dynamically adding the data
 function searchtab(ele){
-// table.clear();    
+// table.clear();   
 var table = $('#dataTables-example').DataTable({
-    "sDom":"ltipr"
+    "sDom":"ltipr",
+    "bDestroy": true
 });
 
 table.rows.add([ele]).draw();
@@ -420,6 +424,7 @@ $('#myInputTextField').on( 'keyup', function () {
 //         }
 //     }
 // })
+
 function logout(){
     sessionStorage.removeItem('sess');
 }
